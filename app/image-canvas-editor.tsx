@@ -27,6 +27,8 @@ export default function ImageCanvasEditor() {
   const [initialDistance, setInitialDistance] = useState<number>(0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [generatedPrompt, setGeneratedPrompt] = useState<string>('')
+
 
   useEffect(() => {
     drawCanvas()
@@ -257,14 +259,15 @@ export default function ImageCanvasEditor() {
   }
 
   const handleGenerate = () => {
-    let logMessage = 'Image Data:\n'  // Start with a heading for clarity
-    
+    let prompt = 'Image Data:\n'
+  
     images.forEach((image) => {
-      logMessage += `Image ID: ${image.id}, X: ${image.x}, Y: ${image.y}, Caption: "${image.caption}"\n`
+      prompt += `Image ID: ${image.id}, X: ${Math.round(image.x)}, Y: ${Math.round(image.y)}, Caption: "${image.caption}"\n`
     })
   
-    console.log(logMessage)
+    setGeneratedPrompt(prompt)
   }
+  
   
   
 
@@ -287,7 +290,9 @@ export default function ImageCanvasEditor() {
 
   return (
     <div className="flex h-screen">
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-8">
+
+        {/* Canvas */}
         <canvas
           ref={canvasRef}
           width={600}
@@ -298,6 +303,8 @@ export default function ImageCanvasEditor() {
           onMouseUp={handleCanvasMouseUp}
           onMouseLeave={handleCanvasMouseLeave}
         />
+
+        {/* Buttons */}
         <div className="mt-4 flex space-x-2">
           <Button onClick={() => fileInputRef.current?.click()}>
             <Upload className="mr-2 h-4 w-4" /> Upload Image
@@ -316,9 +323,21 @@ export default function ImageCanvasEditor() {
             <ArrowDownCircle className="mr-2 h-4 w-4" /> Send Backward
           </Button>
         </div>
+
+        {/* New Div for Generated Prompt */}
+        <div className="w-[600px] h-[200px] mt-4 p-4 border border-gray-300">
+          <h2 className="text-lg font-bold mb-2">Generated Prompt</h2>
+          <pre className="whitespace-pre-wrap">{generatedPrompt}</pre>
+        </div>
       </div>
-      <div className="w-64 h-screen p-4 bg-gray-100 overflow-y-auto">
+
+
+
+      {/* Side Panel */}
+      <div className="w-[400px] h-screen p-4 bg-gray-100 overflow-y-auto">
         <h2 className="text-xl font-bold mb-4">Image List</h2>
+
+        {/* Image Meta Data Div */}
         {images.map((image) => (
           <div
             key={image.id}
@@ -326,6 +345,8 @@ export default function ImageCanvasEditor() {
               selectedImage === image.id ? 'border-blue-500' : 'border-gray-300'
             }`}
           >
+
+            {/* Texts */}
             <div className="flex items-center justify-between">
               <div className="cursor-pointer" onClick={() => setSelectedImage(image.id)}>
                 <p className="font-semibold">Image {image.id}</p>
@@ -333,6 +354,8 @@ export default function ImageCanvasEditor() {
                   Center: ({Math.round(image.x)}, {Math.round(image.y)})
                 </p>
               </div>
+
+              {/* Delete Button */}
               {selectedImage === image.id && (
                 <Button
                   variant="destructive"
@@ -344,6 +367,8 @@ export default function ImageCanvasEditor() {
                 </Button>
               )}
             </div>
+
+            {/* Caption Text Box */}
             <div className="mt-2">
               <label htmlFor={`caption-${image.id}`} className="text-sm font-medium">
                 Caption:
@@ -359,6 +384,8 @@ export default function ImageCanvasEditor() {
             </div>
           </div>
         ))}
+
+
         <Button className="mt-4 w-full" onClick={handleGenerate}>
           Generate
         </Button>
