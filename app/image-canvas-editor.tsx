@@ -264,11 +264,28 @@ export default function ImageCanvasEditor() {
     images.forEach((image) => {
       prompt += `Image ID: ${image.id}, X: ${Math.round(image.x)}, Y: ${Math.round(image.y)}, Caption: "${image.caption}"\n`
     })
-  
-    setGeneratedPrompt(prompt)
+    
+    const reply = fetchChatGptReply(prompt);
+    setGeneratedPrompt(reply);
   }
   
-  
+  const fetchChatGptReply = async (prompt: string) => {
+    try {
+        const response = await fetch('/api/chatgpt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ prompt }),
+        });
+
+        const data = await response.json();
+        return data.reply;
+    } catch (error) {
+        console.error('Error fetching response:', error);
+    }
+};
+
   
 
   const handleDeleteImage = (imageId: number) => {
@@ -286,6 +303,8 @@ export default function ImageCanvasEditor() {
       )
     )
   }
+
+
 
 
   return (
