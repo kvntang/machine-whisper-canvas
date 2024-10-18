@@ -272,7 +272,7 @@ export default function ImageCanvasEditor() {
       const apiRequestBody = {
         model: 'gpt-3.5-turbo', // Specify the model you want to use
         messages: [
-          { role: 'system', content: "You are recieving coordinates of objects as well as a caption descibing the object. Reply in natural language describing the postional relationship for example image 1, a big round apple, is left of, above, behind, underneath, etc." }, // Consider using proper capitalization and punctuation
+          { role: 'system', content: "You are recieving coordinates of objects as well as a caption descibing the object. Reply in natural language describing the postional relationship for example image 1, a big round apple, is left of, above, behind, underneath, etc. Also it can be in relation to the canvas itself. The canvas is 600 wide, 400 height." }, // Consider using proper capitalization and punctuation
           { role: 'user', content: prompt }
         ]
       };
