@@ -4,6 +4,9 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Upload, ArrowUpCircle, ArrowDownCircle, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import dotenv from 'dotenv';
+dotenv.config();
+import axios from 'axios'; // Ensure axios is imported
 
 interface Image {
   id: number
@@ -105,7 +108,6 @@ export default function ImageCanvasEditor() {
       }
     }
   }
-  
 
   const handleCanvasMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
@@ -258,14 +260,36 @@ export default function ImageCanvasEditor() {
     setImages(newImages)
   }
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     let prompt = 'Image Data:\n'
-  
+
     images.forEach((image) => {
-      prompt += `Image ID: ${image.id}, X: ${Math.round(image.x)}, Y: ${Math.round(image.y)}, Caption: "${image.caption}"\n`
+      prompt += `Image ID: ${image.id}, X: ${Math.round(image.x)}, Y: ${Math.round(image.y)}, Caption: "${image.caption}", Z-Index: ${image.zIndex}\n` // Added Z-Index to the prompt
     })
-  
-    setGeneratedPrompt(prompt)
+
+    // **New Code to Call OpenAI API using Axios**
+    try {
+      const apiRequestBody = {
+        model: 'gpt-3.5-turbo', // Specify the model you want to use
+        messages: [
+          { role: 'system', content: "You are recieving coordinates of objects as well as a caption descibing the object. Reply in natural language describing the postional relationship for example image 1, a big round apple, is left of, above, behind, underneath, etc." }, // Consider using proper capitalization and punctuation
+          { role: 'user', content: prompt }
+        ]
+      };
+
+      const response = await axios.post('https://api.openai.com/v1/chat/completions', apiRequestBody, {
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_CHATGPT_API_KEY}`, // Use the API key from .env
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // Return the AI's response to the frontend
+      setGeneratedPrompt(response.data.choices[0].message.content); // Assuming the response contains the text in 'choices[0].message.content'
+    } catch (error) {
+      console.error('Error fetching reply from OpenAI:', error); // Log the error for debugging
+      setGeneratedPrompt('Error generating prompt'); // Handle error case
+    }
   }
   
   
@@ -351,7 +375,7 @@ export default function ImageCanvasEditor() {
               <div className="cursor-pointer" onClick={() => setSelectedImage(image.id)}>
                 <p className="font-semibold">Image {image.id}</p>
                 <p>
-                  Center: ({Math.round(image.x)}, {Math.round(image.y)})
+                  Center: ({Math.round(image.x)}, {Math.round(image.y)}) | Z-Index: {image.zIndex} {/* Added Z-Index display */}
                 </p>
               </div>
 
