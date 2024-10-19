@@ -123,15 +123,14 @@ export default function ImageCanvasEditor() {
         
       {/* Column 3: GeneratedPromptWindow + another div */}
       <div className="p-2" style={{
-        flexBasis: '40%', // Maintain a wider column
-        minWidth: '300px', // Set a minimum width for the column
+        flexBasis: '25%', // Maintain a wider column
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start'
       }}>
         {/* First div in the third column */}
         <div style={{
-          height: '200px', // Specific size for the first div
+          height: 'auto', // Changed height from '200px' to 'auto'
           marginBottom: '20px',
           padding: '10px',
           backgroundColor: '#e0f7fa',
@@ -145,7 +144,23 @@ export default function ImageCanvasEditor() {
   
         {/* Second div in the third column */}
         <div style={{
-          height: '400px', // Specific size for the second div
+          height: 'auto', // Specific size for the second div
+          padding: '10px',
+          marginBottom: '20px',
+          backgroundColor: '#f0f4c3',
+          border: '1px solid #ddd',
+          borderRadius: '8px'
+        }}>
+          <h2 className="text-lg font-bold">Saliency</h2>
+          <GeneratedPromptWindow 
+            coordinates={coordinates}
+          />
+
+        </div>
+
+        {/* third div in the third column */}
+        <div style={{
+          height: 'auto', // Specific size for the second div
           padding: '10px',
           backgroundColor: '#f0f4c3',
           border: '1px solid #ddd',
