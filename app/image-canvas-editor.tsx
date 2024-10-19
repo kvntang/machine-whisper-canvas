@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input'
 import dotenv from 'dotenv';
 dotenv.config();
 import axios from 'axios'; // Ensure axios is imported
+import GeneratedPrompt from './GeneratedPromptWindow'; // Import the new component
+import SidePanel from './SidePanel'; // Import the new SidePanel component
 
 interface Image {
   id: number
@@ -32,6 +34,7 @@ export default function ImageCanvasEditor() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('')
 
+  
 
   useEffect(() => {
     drawCanvas()
@@ -260,41 +263,6 @@ export default function ImageCanvasEditor() {
     setImages(newImages)
   }
 
-  const handleGenerate = async () => {
-    let prompt = 'Image Data:\n'
-
-    images.forEach((image) => {
-      prompt += `Image ID: ${image.id}, X: ${Math.round(image.x)}, Y: ${Math.round(image.y)}, Caption: "${image.caption}", Z-Index: ${image.zIndex}\n` // Added Z-Index to the prompt
-    })
-
-    // **New Code to Call OpenAI API using Axios**
-    try {
-      const apiRequestBody = {
-        model: 'gpt-3.5-turbo', // Specify the model you want to use
-        messages: [
-          { role: 'system', content: "You are recieving coordinates of objects as well as a caption descibing the object. Reply in natural language describing the postional relationship for example a big round apple, is left of, above, behind, across, underneath, etc. Also it can be in relation to the canvas itself. The canvas is 600 wide, 400 height." }, // Consider using proper capitalization and punctuation
-          { role: 'user', content: prompt }
-        ]
-      };
-
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', apiRequestBody, {
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_CHATGPT_API_KEY}`, // Use the API key from .env
-          'Content-Type': 'application/json',
-        },
-      });
-
-      // Return the AI's response to the frontend
-      setGeneratedPrompt(response.data.choices[0].message.content); // Assuming the response contains the text in 'choices[0].message.content'
-    } catch (error) {
-      console.error('Error fetching reply from OpenAI:', error); // Log the error for debugging
-      setGeneratedPrompt('Error generating prompt'); // Handle error case
-    }
-  }
-  
-  
-  
-
   const handleDeleteImage = (imageId: number) => {
     setImages((prevImages) => prevImages.filter((img) => img.id !== imageId))
     if (selectedImage === imageId) {
@@ -315,7 +283,6 @@ export default function ImageCanvasEditor() {
   return (
     <div className="flex h-screen">
       <div className="flex-1 p-8">
-
         {/* Canvas */}
         <canvas
           ref={canvasRef}
@@ -348,72 +315,19 @@ export default function ImageCanvasEditor() {
           </Button>
         </div>
 
-        {/* New Div for Generated Prompt */}
-        <div className="w-[600px] h-[200px] mt-4 p-4 border border-gray-300">
-          <h2 className="text-lg font-bold mb-2">Generated Prompt</h2>
-          <pre className="whitespace-pre-wrap">{generatedPrompt}</pre>
-        </div>
+        {/* Generated Prompt Window */}
+        <GeneratedPrompt generatedPrompt={generatedPrompt} />
       </div>
 
-
-
-      {/* Side Panel */}
-      <div className="w-[400px] h-screen p-4 bg-gray-100 overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">Image List</h2>
-
-        {/* Image Meta Data Div */}
-        {images.map((image) => (
-          <div
-            key={image.id}
-            className={`mb-4 p-2 border ${
-              selectedImage === image.id ? 'border-blue-500' : 'border-gray-300'
-            }`}
-          >
-
-            {/* Texts */}
-            <div className="flex items-center justify-between">
-              <div className="cursor-pointer" onClick={() => setSelectedImage(image.id)}>
-                <p className="font-semibold">Image {image.id}</p>
-                <p>
-                  Center: ({Math.round(image.x)}, {Math.round(image.y)}) | Z-Index: {image.zIndex} {/* Added Z-Index display */}
-                </p>
-              </div>
-
-              {/* Delete Button */}
-              {selectedImage === image.id && (
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="ml-2"
-                  onClick={() => handleDeleteImage(image.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-
-            {/* Caption Text Box */}
-            <div className="mt-2">
-              <label htmlFor={`caption-${image.id}`} className="text-sm font-medium">
-                Caption:
-              </label>
-              <input
-                id={`caption-${image.id}`}
-                type="text"
-                value={image.caption}
-                onChange={(e) => handleCaptionChange(image.id, e.target.value)}
-                className="mt-1 block w-full px-2 py-1 border border-gray-300 rounded"
-                placeholder="Enter caption..."
-              />
-            </div>
-          </div>
-        ))}
-
-
-        <Button className="mt-4 w-full" onClick={handleGenerate}>
-          Generate
-        </Button>
-      </div>
+      {/* SidePanel */}
+      <SidePanel
+        images={images}
+        selectedImage={selectedImage}
+        handleDeleteImage={handleDeleteImage}
+        handleCaptionChange={handleCaptionChange}
+        setSelectedImage={setSelectedImage}
+        setGeneratedPrompt={setGeneratedPrompt} // Pass the setGeneratedPrompt function
+      />
     </div>
   )
 }
