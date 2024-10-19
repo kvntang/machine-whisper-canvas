@@ -22,6 +22,7 @@ interface ImageCanvasProps {
   selectedImage: number | null;
   setSelectedImage: React.Dispatch<React.SetStateAction<number | null>>;
   setCoordinates: React.Dispatch<React.SetStateAction<string>>;
+  setCanvasDataURL: (dataURL: string) => void; // New prop for emitting canvas image
 }
 
 const ImageCanvas: React.FC<ImageCanvasProps> = ({
@@ -30,6 +31,7 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
   selectedImage,
   setSelectedImage,
   setCoordinates,
+  setCanvasDataURL, // Destructure the new prop
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,6 +82,12 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
         );
       }
     });
+
+    // Emit the canvas image as a data URL
+    const dataURL = canvas.toDataURL('image/png');
+    // console.log("url is here");
+    // console.log(dataURL);
+    setCanvasDataURL(dataURL); // Call the emit function
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,28 +122,31 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
   const handleCanvasMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
+  
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-
+  
+    let clickedOnImage = false; // Track if any image was clicked
+  
     for (let i = images.length - 1; i >= 0; i--) {
       const image = images[i];
       const imgWidth = image.width * image.scale;
       const imgHeight = image.height * image.scale;
-
+  
       const imageLeft = image.x - imgWidth / 2;
       const imageTop = image.y - imgHeight / 2;
       const imageRight = image.x + imgWidth / 2;
       const imageBottom = image.y + imgHeight / 2;
-
+  
       if (x >= imageLeft && x <= imageRight && y >= imageTop && y <= imageBottom) {
+        clickedOnImage = true; // Mark that an image was clicked
         setSelectedImage(image.id);
-
+  
         const anchorSize = 10;
         const anchorLeft = imageRight - 5;
         const anchorTop = imageTop - 5;
-
+  
         if (x >= anchorLeft && x <= anchorLeft + anchorSize && y >= anchorTop && y <= anchorTop + anchorSize) {
           setIsScaling(true);
           setInitialScale(image.scale);
@@ -149,7 +160,12 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
         break;
       }
     }
+  
+    if (!clickedOnImage) {
+      setSelectedImage(null); // Deselect if no image was clicked
+    }
   };
+  
 
   const handleCanvasMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;

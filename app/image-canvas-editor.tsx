@@ -9,7 +9,7 @@ dotenv.config();
 import axios from 'axios'; // Ensure axios is imported
 import GeneratedPromptWindow from './GeneratedPromptWindow'; // Import the new component
 import SidePanel from './SidePanel'; // Import the new SidePanel component
-import ImageCanvas from './ImageCanvas'; // Import the new ImageCanvas component
+import ImageCanvas from './ImageCanvas'; // Import the ImageCanvas component
 
 
 interface Image {
@@ -26,20 +26,10 @@ interface Image {
 }
 
 export default function ImageCanvasEditor() {
-  // const [images, setImages] = useState<Image[]>([])
-  // const [selectedImage, setSelectedImage] = useState<number | null>(null)
-  // const [isDragging, setIsDragging] = useState(false)
-  // const [isScaling, setIsScaling] = useState(false)
-  // const [initialScale, setInitialScale] = useState<number>(1)
-  // const [initialDistance, setInitialDistance] = useState<number>(0)
-  // const canvasRef = useRef<HTMLCanvasElement>(null)
-  // const fileInputRef = useRef<HTMLInputElement>(null)
-  // const [coordinates, setCoordinates] = useState<string>('')
   const [images, setImages] = useState<Image[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [coordinates, setCoordinates] = useState<string>('');
-
-  
+  const [canvasDataURL, setCanvasDataURL] = useState<string>(''); // State to hold the emitted canvas image data URL
 
   const handleDeleteImage = (imageId: number) => {
     setImages((prevImages) => prevImages.filter((img) => img.id !== imageId))
@@ -57,6 +47,9 @@ export default function ImageCanvasEditor() {
     )
   }
 
+  const handleCanvasUpdate = (dataURL: string) => {
+    setCanvasDataURL(dataURL); // Update the state with the emitted image data URL
+  };
 
   return (
     <div className="flex h-screen" style={{
@@ -116,6 +109,7 @@ export default function ImageCanvasEditor() {
             selectedImage={selectedImage}
             setSelectedImage={setSelectedImage}
             setCoordinates={setCoordinates}
+            setCanvasDataURL={handleCanvasUpdate} // Pass the emit function
           />
         </div>
       </div>
@@ -152,6 +146,7 @@ export default function ImageCanvasEditor() {
           borderRadius: '8px'
         }}>
           <h2 className="text-lg font-bold">Saliency</h2>
+          <img src={canvasDataURL} alt="Canvas Output" style={{ maxWidth: '100%', height: 'auto' }} />
           <GeneratedPromptWindow 
             coordinates={coordinates}
           />
@@ -167,7 +162,6 @@ export default function ImageCanvasEditor() {
           borderRadius: '8px'
         }}>
           <h2 className="text-lg font-bold">Final Output</h2>
-
         </div>
       </div>
     </div>
