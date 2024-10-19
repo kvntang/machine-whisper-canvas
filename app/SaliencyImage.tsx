@@ -1,5 +1,4 @@
-// SaliencyImage.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import useOpenCV from './OpenCV';
 
@@ -11,28 +10,43 @@ const SaliencyImage: React.FC<SaliencyImageProps> = ({ canvasDataURL }) => {
   const [updatedImage, setUpdatedImage] = useState(canvasDataURL);
   const isOpenCVReady = useOpenCV(); // Load OpenCV globally
 
-  const handleGenerate = () => {
-    if (!isOpenCVReady) {
-      console.error('OpenCV is not ready yet.');
+  const handleGenerate = async () => {
+    if (!canvasDataURL) {
+      console.error("No image data to process.");
       return;
     }
-
-    const imageInput = new Image();
-    imageInput.src = canvasDataURL;
-
-    imageInput.onload = function () {
-      let mat = window.cv.imread(imageInput); // Read image data into OpenCV matrix
-      window.cv.cvtColor(mat, mat, window.cv.COLOR_RGBA2GRAY); // Convert to greyscale
-
-      // Display processed image in an output canvas element
-      window.cv.imshow('output', mat);
-      const outputCanvas = document.getElementById('output') as HTMLCanvasElement;
-      const imageOutput = outputCanvas.toDataURL(); // Save processed image as a data URL
-
-      setUpdatedImage(imageOutput); // Update state with new image
-
-      mat.delete(); // Clean up the matrix
-    };
+    try {
+      // Convert the canvas data URL to a Blob object
+      const response = await fetch(canvasDataURL);
+      const blob = await response.blob();
+      
+      // Create a FormData object to send the image as form-data
+      const formData = new FormData();
+      formData.append('file', blob, 'image.png'); // Append the blob with the key 'file'
+  
+      // Make a POST request to the Flask API
+      const apiResponse = await fetch('http://127.0.0.1:5000/api/v1/process-image', {
+        method: 'POST',
+        body: formData, // Send as form-data
+      });
+  
+      if (!apiResponse.ok) {
+        console.error('Failed to process the image');
+        return;
+      }
+  
+      // Receive the processed image as a Blob
+      const processedBlob = await apiResponse.blob();
+      
+      // Convert the Blob back to a Data URL to update the image
+      const processedImageURL = URL.createObjectURL(processedBlob);
+      
+      // Update the state with the new image
+      setUpdatedImage(processedImageURL);
+      
+    } catch (error) {
+      console.error("Error processing image:", error);
+    }
   };
 
   return (

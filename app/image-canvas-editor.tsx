@@ -11,6 +11,7 @@ import GeneratedPromptWindow from './GeneratedPromptWindow'; // Import the new c
 import SidePanel from './SidePanel'; // Import the new SidePanel component
 import ImageCanvas from './ImageCanvas'; // Import the ImageCanvas component
 import SaliencyImage from './SaliencyImage'; // Import the SaliencyImage component
+import StableDiffusion from './StableDiffusion'
 
 
 interface Image {
@@ -158,7 +159,7 @@ export default function ImageCanvasEditor() {
           border: '1px solid #ddd',
           borderRadius: '8px'
         }}>
-          <h2 className="text-lg font-bold">Final Output</h2>
+          <StableDiffusion canvasDataURL={canvasDataURL} />   
         </div>
       </div>
     </div>
