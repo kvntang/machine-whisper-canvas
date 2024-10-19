@@ -10,6 +10,7 @@ import axios from 'axios'; // Ensure axios is imported
 import GeneratedPromptWindow from './GeneratedPromptWindow'; // Import the new component
 import SidePanel from './SidePanel'; // Import the new SidePanel component
 import ImageCanvas from './ImageCanvas'; // Import the ImageCanvas component
+import SaliencyImage from './SaliencyImage'; // Import the SaliencyImage component
 
 
 interface Image {
@@ -145,11 +146,7 @@ export default function ImageCanvasEditor() {
           border: '1px solid #ddd',
           borderRadius: '8px'
         }}>
-          <h2 className="text-lg font-bold">Saliency</h2>
-          <img src={canvasDataURL} alt="Canvas Output" style={{ maxWidth: '100%', height: 'auto' }} />
-          <GeneratedPromptWindow 
-            coordinates={coordinates}
-          />
+          <SaliencyImage canvasDataURL={canvasDataURL} />          
 
         </div>
 
