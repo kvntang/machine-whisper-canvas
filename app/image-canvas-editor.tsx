@@ -47,7 +47,9 @@ export default function ImageCanvasEditor() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    // Fill the canvas with a white background
+    ctx.fillStyle = 'white'; // Set fill color to white
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill the entire canvas
 
     images
       .sort((a, b) => a.zIndex - b.zIndex)
@@ -283,56 +285,80 @@ export default function ImageCanvasEditor() {
   return (
     <div className="flex h-screen">
       <div className="flex-1 p-8">
-        {/* Canvas */}
-        <canvas
-          ref={canvasRef}
-          width={600}
-          height={400}
-          className="border border-gray-300"
-          onMouseDown={handleCanvasMouseDown}
-          onMouseMove={handleCanvasMouseMove}
-          onMouseUp={handleCanvasMouseUp}
-          onMouseLeave={handleCanvasMouseLeave}
-        />
-
-        {/* Buttons */}
-        <div className="mt-4 flex space-x-2">
-          <Button onClick={() => fileInputRef.current?.click()}>
-            <Upload className="mr-2 h-4 w-4" /> Upload Image
-          </Button>
-          <Input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
+        <div className="canvas-container" style={{
+          marginBottom: '20px', // Adjust spacing as needed
+          width: '625px',
+          padding: '10px', // Add padding if necessary
+          backgroundColor: '#e0f7fa', // Example background color
+          border: '1px solid #ddd', // Example border
+          borderRadius: '8px' // Rounded corners
+        }}> {/* New div wrapping canvas and buttons */}
+          <canvas
+            ref={canvasRef}
+            width={600}
+            height={400}
+            className="border border-gray-300"
+            onMouseDown={handleCanvasMouseDown}
+            onMouseMove={handleCanvasMouseMove}
+            onMouseUp={handleCanvasMouseUp}
+            onMouseLeave={handleCanvasMouseLeave}
           />
-          <Button onClick={() => handleLayerChange('up')} disabled={selectedImage === null}>
-            <ArrowUpCircle className="mr-2 h-4 w-4" /> Bring Forward
-          </Button>
-          <Button onClick={() => handleLayerChange('down')} disabled={selectedImage === null}>
-            <ArrowDownCircle className="mr-2 h-4 w-4" /> Send Backward
-          </Button>
-        </div>
+
+          {/* Buttons */}
+          <div className="mt-4 flex space-x-2">
+            <Button onClick={() => fileInputRef.current?.click()}>
+              <Upload className="mr-2 h-4 w-4" /> Upload Image
+            </Button>
+            <Input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+            />
+            <Button onClick={() => handleLayerChange('up')} disabled={selectedImage === null}>
+              <ArrowUpCircle className="mr-2 h-4 w-4" /> Bring Forward
+            </Button>
+            <Button onClick={() => handleLayerChange('down')} disabled={selectedImage === null}>
+              <ArrowDownCircle className="mr-2 h-4 w-4" /> Send Backward
+            </Button>
+          </div>
+        </div> {/* End of new div */}
 
         {/* Generated Prompt Window */}
-        {/* <GeneratedPromptWindow 
-        generatedPrompt={generatedPrompt} />
-      </div> */}
-      <GeneratedPromptWindow 
-        coordinates={coordinates}
-        />
-      </div>
+        <div style={{
+          marginBottom: '20px', // Adjust spacing as needed
+          width: '400px',
+          padding: '10px', // Add padding if necessary
+          backgroundColor: '#e0f7fa', // Example background color
+          border: '1px solid #ddd', // Example border
+          borderRadius: '8px' // Rounded corners
+        }}>
+          <GeneratedPromptWindow 
+            coordinates={coordinates}
+          />
+        </div>
 
-      {/* SidePanel */}
-      <SidePanel
-        images={images}
-        selectedImage={selectedImage}
-        handleDeleteImage={handleDeleteImage}
-        handleCaptionChange={handleCaptionChange}
-        setSelectedImage={setSelectedImage}
-        setCoordinates={setCoordinates} // Pass the setGeneratedPrompt function
-      />
+        {/* SidePanel */}
+        <div style={{
+          width: '400px', // Set a fixed width for the side panel
+          height: '400px', // Set a fixed height for the side panel
+          backgroundColor: '#e0f7fa', // Example background color
+          overflowY: 'auto', // Enable scrolling if content overflows
+          padding: '1px', // Add padding
+          border: '1px solid #ddd', // Example border
+          borderRadius: '8px' // Rounded corners
+        }}>
+          <SidePanel
+            images={images}
+            selectedImage={selectedImage}
+            handleDeleteImage={handleDeleteImage}
+            handleCaptionChange={handleCaptionChange}
+            setSelectedImage={setSelectedImage}
+            setCoordinates={setCoordinates} // Pass the setGeneratedPrompt function
+          />
+        </div>
+      </div>
     </div>
   )
 }

@@ -45,7 +45,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
   }, [images, setCoordinates]);
 
   return (
-    <div className="w-[400px] h-[700px] p-4 bg-green-500 overflow-y-auto"> {/* Set fixed height to 600px */}
+    <div className="w-[400px] h-full p-4 overflow-y-auto"> {/* Removed fixed height to allow scrolling based on parent div height */}
       <h2 className="text-xl font-bold mb-4">Image List</h2>
 
       {/* Image Meta Data Div */}

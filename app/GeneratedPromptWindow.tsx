@@ -43,12 +43,17 @@ const GeneratedPrompt: React.FC<GeneratedPromptProps> = ({ coordinates }) => {
   };
 
   return (
-    <div className="w-[600px] h-[200px] mt-4 p-4 border border-gray-300 bg-green-500">
-      <h2 className="text-lg font-bold mb-2">Generated Prompt</h2>
-      <pre className="whitespace-pre-wrap">{chatgptResponse}</pre>
+    <div className="w-full h-auto mt-4 p-4">
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-lg font-bold">Generated Prompt</h2>
+        {/* Generate Button using the Button UI component */}
+        <Button onClick={handleGenerate}>Generate</Button>
+      </div>
 
-      {/* Generate Button using the Button UI component */}
-      <Button onClick={handleGenerate}>Generate</Button>
+      {/* Separate div for the generated response */}
+      <div>
+        <pre className="whitespace-pre-wrap">{chatgptResponse}</pre>
+      </div>
     </div>
   );
 };
