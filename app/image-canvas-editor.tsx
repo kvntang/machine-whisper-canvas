@@ -9,6 +9,8 @@ dotenv.config();
 import axios from 'axios'; // Ensure axios is imported
 import GeneratedPromptWindow from './GeneratedPromptWindow'; // Import the new component
 import SidePanel from './SidePanel'; // Import the new SidePanel component
+import ImageCanvas from './ImageCanvas'; // Import the new ImageCanvas component
+
 
 interface Image {
   id: number
@@ -24,246 +26,20 @@ interface Image {
 }
 
 export default function ImageCanvasEditor() {
-  const [images, setImages] = useState<Image[]>([])
-  const [selectedImage, setSelectedImage] = useState<number | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [isScaling, setIsScaling] = useState(false)
-  const [initialScale, setInitialScale] = useState<number>(1)
-  const [initialDistance, setInitialDistance] = useState<number>(0)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [coordinates, setCoordinates] = useState<string>('')
+  // const [images, setImages] = useState<Image[]>([])
+  // const [selectedImage, setSelectedImage] = useState<number | null>(null)
+  // const [isDragging, setIsDragging] = useState(false)
+  // const [isScaling, setIsScaling] = useState(false)
+  // const [initialScale, setInitialScale] = useState<number>(1)
+  // const [initialDistance, setInitialDistance] = useState<number>(0)
+  // const canvasRef = useRef<HTMLCanvasElement>(null)
+  // const fileInputRef = useRef<HTMLInputElement>(null)
+  // const [coordinates, setCoordinates] = useState<string>('')
+  const [images, setImages] = useState<Image[]>([]);
+  const [selectedImage, setSelectedImage] = useState<number | null>(null);
+  const [coordinates, setCoordinates] = useState<string>('');
 
   
-
-  useEffect(() => {
-    drawCanvas()
-  }, [images, selectedImage, isScaling])
-
-  const drawCanvas = () => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Fill the canvas with a white background
-    ctx.fillStyle = 'white'; // Set fill color to white
-    ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill the entire canvas
-
-    images
-      .sort((a, b) => a.zIndex - b.zIndex)
-      .forEach((image) => {
-        const imgWidth = image.width * image.scale
-        const imgHeight = image.height * image.scale
-
-        ctx.save()
-        ctx.translate(image.x, image.y)
-        ctx.drawImage(image.img, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight)
-        ctx.restore()
-
-        if (image.id === selectedImage) {
-          ctx.strokeStyle = 'blue'
-          ctx.lineWidth = 2
-          ctx.strokeRect(
-            image.x - imgWidth / 2,
-            image.y - imgHeight / 2,
-            imgWidth,
-            imgHeight
-          )
-
-          // Draw scaling anchor in the top right corner
-          ctx.fillStyle = isScaling ? 'red' : 'blue'
-          ctx.fillRect(
-            image.x + imgWidth / 2 - 5,
-            image.y - imgHeight / 2 - 5,
-            10,
-            10
-          )
-        }
-      })
-  }
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      const imgElement = new window.Image()
-      imgElement.src = URL.createObjectURL(file)
-      imgElement.onload = () => {
-        const canvas = canvasRef.current
-        if (!canvas) return
-
-        const imgWidth = imgElement.width
-        const imgHeight = imgElement.height
-
-        // Create a new image object with a sequential id starting from 1
-        const newImage: Image = {
-          id: images.length + 1, // Assigns id based on the current length of the images array
-          file,
-          x: canvas.width / 2,
-          y: canvas.height / 2,
-          scale: Math.min(1, canvas.width / imgWidth, canvas.height / imgHeight),
-          zIndex: images.length,
-          img: imgElement,
-          width: imgWidth,
-          height: imgHeight,
-          caption: '', // Initialize caption as empty string
-        }
-        setImages([...images, newImage]) // Add the new image to the state array
-      }
-    }
-  }
-
-  const handleCanvasMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-
-    for (let i = images.length - 1; i >= 0; i--) {
-      const image = images[i]
-      const imgWidth = image.width * image.scale
-      const imgHeight = image.height * image.scale
-
-      const imageLeft = image.x - imgWidth / 2
-      const imageTop = image.y - imgHeight / 2
-      const imageRight = image.x + imgWidth / 2
-      const imageBottom = image.y + imgHeight / 2
-
-      if (x >= imageLeft && x <= imageRight && y >= imageTop && y <= imageBottom) {
-        setSelectedImage(image.id)
-
-        // Check if clicking on scaling anchor
-        const anchorSize = 10
-        const anchorLeft = imageRight - 5
-        const anchorTop = imageTop - 5
-
-        if (
-          x >= anchorLeft &&
-          x <= anchorLeft + anchorSize &&
-          y >= anchorTop &&
-          y <= anchorTop + anchorSize
-        ) {
-          setIsScaling(true)
-          setInitialScale(image.scale)
-          const dx = x - image.x
-          const dy = y - image.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
-          setInitialDistance(distance)
-        } else {
-          setIsDragging(true)
-        }
-        break
-      }
-    }
-  }
-
-  const handleCanvasMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-
-    if (isDragging) {
-      canvas.style.cursor = 'move'
-      setImages((prevImages) =>
-        prevImages.map((img) => {
-          if (img.id === selectedImage) {
-            return { ...img, x, y }
-          }
-          return img
-        })
-      )
-    } else if (isScaling) {
-      canvas.style.cursor = 'nesw-resize'
-      setImages((prevImages) =>
-        prevImages.map((img) => {
-          if (img.id === selectedImage) {
-            const dx = x - img.x
-            const dy = y - img.y
-            const distance = Math.sqrt(dx * dx + dy * dy)
-            const scaleChange = distance / initialDistance
-            const newScale = initialScale * scaleChange
-            return { ...img, scale: Math.max(0.1, Math.min(newScale, 5)) } // Limit scale between 0.1 and 5
-          }
-          return img
-        })
-      )
-    } else {
-      // Change cursor style based on position
-      let cursor = 'default'
-      if (selectedImage !== null) {
-        const img = images.find((img) => img.id === selectedImage)
-        if (img) {
-          const imgWidth = img.width * img.scale
-          const imgHeight = img.height * img.scale
-
-          const imageLeft = img.x - imgWidth / 2
-          const imageTop = img.y - imgHeight / 2
-          const imageRight = img.x + imgWidth / 2
-          const imageBottom = img.y + imgHeight / 2
-
-          const anchorSize = 10
-          const anchorLeft = imageRight - 5
-          const anchorTop = imageTop - 5
-
-          if (
-            x >= anchorLeft &&
-            x <= anchorLeft + anchorSize &&
-            y >= anchorTop &&
-            y <= anchorTop + anchorSize
-          ) {
-            cursor = 'nesw-resize'
-          } else if (x >= imageLeft && x <= imageRight && y >= imageTop && y <= imageBottom) {
-            cursor = 'move'
-          }
-        }
-      }
-      canvas.style.cursor = cursor
-    }
-  }
-
-  const handleCanvasMouseUp = () => {
-    setIsDragging(false)
-    setIsScaling(false)
-    const canvas = canvasRef.current
-    if (canvas) {
-      canvas.style.cursor = 'default'
-    }
-  }
-
-  const handleCanvasMouseLeave = () => {
-    setIsDragging(false)
-    setIsScaling(false)
-    const canvas = canvasRef.current
-    if (canvas) {
-      canvas.style.cursor = 'default'
-    }
-  }
-
-  const handleLayerChange = (direction: 'up' | 'down') => {
-    if (selectedImage === null) return
-    const currentIndex = images.findIndex((img) => img.id === selectedImage)
-    const targetIndex = direction === 'up' ? currentIndex + 1 : currentIndex - 1
-
-    if (targetIndex < 0 || targetIndex >= images.length) return
-
-    const newImages = [...images]
-    const temp = newImages[currentIndex]
-    newImages[currentIndex] = newImages[targetIndex]
-    newImages[targetIndex] = temp
-
-    // Update zIndex values
-    newImages.forEach((img, index) => {
-      img.zIndex = index
-    })
-
-    setImages(newImages)
-  }
 
   const handleDeleteImage = (imageId: number) => {
     setImages((prevImages) => prevImages.filter((img) => img.id !== imageId))
@@ -283,71 +59,27 @@ export default function ImageCanvasEditor() {
 
 
   return (
-    <div className="flex h-screen">
-      <div className="flex-1 p-8">
-        <div className="canvas-container" style={{
-          marginBottom: '20px', // Adjust spacing as needed
-          width: '625px',
-          padding: '10px', // Add padding if necessary
-          backgroundColor: '#e0f7fa', // Example background color
-          border: '1px solid #ddd', // Example border
-          borderRadius: '8px' // Rounded corners
-        }}> {/* New div wrapping canvas and buttons */}
-          <canvas
-            ref={canvasRef}
-            width={600}
-            height={400}
-            className="border border-gray-300"
-            onMouseDown={handleCanvasMouseDown}
-            onMouseMove={handleCanvasMouseMove}
-            onMouseUp={handleCanvasMouseUp}
-            onMouseLeave={handleCanvasMouseLeave}
-          />
-
-          {/* Buttons */}
-          <div className="mt-4 flex space-x-2">
-            <Button onClick={() => fileInputRef.current?.click()}>
-              <Upload className="mr-2 h-4 w-4" /> Upload Image
-            </Button>
-            <Input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-            />
-            <Button onClick={() => handleLayerChange('up')} disabled={selectedImage === null}>
-              <ArrowUpCircle className="mr-2 h-4 w-4" /> Bring Forward
-            </Button>
-            <Button onClick={() => handleLayerChange('down')} disabled={selectedImage === null}>
-              <ArrowDownCircle className="mr-2 h-4 w-4" /> Send Backward
-            </Button>
-          </div>
-        </div> {/* End of new div */}
-
-        {/* Generated Prompt Window */}
+    <div className="flex h-screen" style={{
+      display: 'flex', 
+      gap: '2px', // Reduced gap between columns
+      padding: '5px' // Optional padding around the layout
+    }}>
+      
+  
+      {/* Column 1: SidePanel - smaller column */}
+      <div className="p-2" style={{
+        flexBasis: '25%', // Smaller column (25% of total width)
+        display: 'flex', 
+        flexDirection: 'column',
+        justifyContent: 'flex-start'
+      }}>
         <div style={{
-          marginBottom: '20px', // Adjust spacing as needed
-          width: '400px',
-          padding: '10px', // Add padding if necessary
-          backgroundColor: '#e0f7fa', // Example background color
-          border: '1px solid #ddd', // Example border
-          borderRadius: '8px' // Rounded corners
-        }}>
-          <GeneratedPromptWindow 
-            coordinates={coordinates}
-          />
-        </div>
-
-        {/* SidePanel */}
-        <div style={{
-          width: '400px', // Set a fixed width for the side panel
-          height: '400px', // Set a fixed height for the side panel
-          backgroundColor: '#e0f7fa', // Example background color
-          overflowY: 'auto', // Enable scrolling if content overflows
-          padding: '1px', // Add padding
-          border: '1px solid #ddd', // Example border
-          borderRadius: '8px' // Rounded corners
+          height: '500px', // Specific size for side panel div
+          backgroundColor: '#e0f7fa',
+          overflowY: 'auto',
+          padding: '1px',
+          border: '1px solid #ddd',
+          borderRadius: '8px'
         }}>
           <SidePanel
             images={images}
@@ -355,10 +87,75 @@ export default function ImageCanvasEditor() {
             handleDeleteImage={handleDeleteImage}
             handleCaptionChange={handleCaptionChange}
             setSelectedImage={setSelectedImage}
-            setCoordinates={setCoordinates} // Pass the setGeneratedPrompt function
+            setCoordinates={setCoordinates}
           />
         </div>
       </div>
+
+      {/* Column 2: ImageCanvas - larger column */}
+      <div className="p-2" style={{ // Changed padding from 'p-8' to 'p-4'
+        flexBasis: '25%', // Larger column (50% of total width)
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start'
+      }}>
+        <div className="canvas-container" style={{
+          height: '500px', // Specific size for the canvas div
+          marginBottom: '20px',
+          padding: '5px',
+          backgroundColor: '#e0f7fa',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <ImageCanvas 
+            images={images}
+            setImages={setImages}
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+            setCoordinates={setCoordinates}
+          />
+        </div>
+      </div>
+  
+        
+      {/* Column 3: GeneratedPromptWindow + another div */}
+      <div className="p-2" style={{
+        flexBasis: '40%', // Maintain a wider column
+        minWidth: '300px', // Set a minimum width for the column
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start'
+      }}>
+        {/* First div in the third column */}
+        <div style={{
+          height: '200px', // Specific size for the first div
+          marginBottom: '20px',
+          padding: '10px',
+          backgroundColor: '#e0f7fa',
+          border: '1px solid #ddd',
+          borderRadius: '8px'
+        }}>
+          <GeneratedPromptWindow 
+            coordinates={coordinates}
+          />
+        </div>
+  
+        {/* Second div in the third column */}
+        <div style={{
+          height: '400px', // Specific size for the second div
+          padding: '10px',
+          backgroundColor: '#f0f4c3',
+          border: '1px solid #ddd',
+          borderRadius: '8px'
+        }}>
+          <h2 className="text-lg font-bold">Final Output</h2>
+
+        </div>
+      </div>
     </div>
-  )
+  )  
+  
 }
