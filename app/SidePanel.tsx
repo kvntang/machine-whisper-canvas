@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import axios from 'axios'; // Ensure axios is imported
@@ -17,7 +17,7 @@ interface SidePanelProps {
   handleDeleteImage: (imageId: number) => void;
   handleCaptionChange: (id: number, newCaption: string) => void;
   setSelectedImage: (id: number) => void;
-  setGeneratedPrompt: (prompt: string) => void; // Add this line to set the generated prompt
+  setCoordinates: (coordinates: string) => void;
 }
 
 const SidePanel: React.FC<SidePanelProps> = ({
@@ -26,48 +26,27 @@ const SidePanel: React.FC<SidePanelProps> = ({
   handleDeleteImage,
   handleCaptionChange,
   setSelectedImage,
-  setGeneratedPrompt, // Add this line
+  setCoordinates,
 }) => {
-  const handleGenerate = async () => {
-    let prompt = 'Image Data:\n';
+  // Automatically call handleGenerate whenever images array changes
+  useEffect(() => {
+    const handleGenerate = () => {
+      let prompt = 'Image Data:\n';
 
-    images.forEach((image) => {
-      prompt += `Image ID: ${image.id}, X: ${Math.round(image.x)}, Y: ${Math.round(image.y)}, Caption: "${image.caption}", Z-Index: ${image.zIndex}\n`;
-    });
-
-    // **New Code to Call OpenAI API using Axios**
-    try {
-      const apiRequestBody = {
-        model: 'gpt-3.5-turbo',
-        messages: [
-          { role: 'system', content: "You are receiving coordinates of objects as well as a caption describing the object. Reply in natural language describing the positional relationship for example a big round apple, is left of, above, behind, across, underneath, etc. Also it can be in relation to the canvas itself. The canvas is 600 wide, 400 height." },
-          { role: 'user', content: prompt }
-        ]
-      };
-
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', apiRequestBody, {
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_CHATGPT_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
+      images.forEach((image) => {
+        prompt += `Image ID: ${image.id}, X: ${Math.round(image.x)}, Y: ${Math.round(image.y)}, Caption: "${image.caption}", Z-Index: ${image.zIndex}\n`;
       });
 
-      // Return the AI's response to the frontend
-      setGeneratedPrompt(response.data.choices[0].message.content);
-    } catch (error) {
-      console.error('Error fetching reply from OpenAI:', error);
-      setGeneratedPrompt('Error generating prompt');
-    }
-  };
+      setCoordinates(prompt);
+    };
+
+    // Call the handleGenerate function every time the images array or any relevant data changes
+    handleGenerate();
+  }, [images, setCoordinates]);
 
   return (
     <div className="w-[400px] h-[700px] p-4 bg-green-500 overflow-y-auto"> {/* Set fixed height to 600px */}
       <h2 className="text-xl font-bold mb-4">Image List</h2>
-
-      {/* New Generate Button */}
-      <Button onClick={handleGenerate} variant="primary" className="mb-4">
-        Generate
-      </Button>
 
       {/* Image Meta Data Div */}
       {images.map((image) => (

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import dotenv from 'dotenv';
 dotenv.config();
 import axios from 'axios'; // Ensure axios is imported
-import GeneratedPrompt from './GeneratedPromptWindow'; // Import the new component
+import GeneratedPromptWindow from './GeneratedPromptWindow'; // Import the new component
 import SidePanel from './SidePanel'; // Import the new SidePanel component
 
 interface Image {
@@ -32,7 +32,7 @@ export default function ImageCanvasEditor() {
   const [initialDistance, setInitialDistance] = useState<number>(0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [generatedPrompt, setGeneratedPrompt] = useState<string>('')
+  const [coordinates, setCoordinates] = useState<string>('')
 
   
 
@@ -316,7 +316,12 @@ export default function ImageCanvasEditor() {
         </div>
 
         {/* Generated Prompt Window */}
-        <GeneratedPrompt generatedPrompt={generatedPrompt} />
+        {/* <GeneratedPromptWindow 
+        generatedPrompt={generatedPrompt} />
+      </div> */}
+      <GeneratedPromptWindow 
+        coordinates={coordinates}
+        />
       </div>
 
       {/* SidePanel */}
@@ -326,7 +331,7 @@ export default function ImageCanvasEditor() {
         handleDeleteImage={handleDeleteImage}
         handleCaptionChange={handleCaptionChange}
         setSelectedImage={setSelectedImage}
-        setGeneratedPrompt={setGeneratedPrompt} // Pass the setGeneratedPrompt function
+        setCoordinates={setCoordinates} // Pass the setGeneratedPrompt function
       />
     </div>
   )

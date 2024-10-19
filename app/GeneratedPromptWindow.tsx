@@ -1,31 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button'; // Ensure the Button component is imported
 import axios from 'axios'; // Ensure axios is imported
 
-interface Image {
-    id: number;
-    x: number;
-    y: number;
-    zIndex: number;
-    caption: string;
-  }
 interface GeneratedPromptProps {
-  generatedPrompt: string;
-  images: Image[];
-  selectedImage: number | null;
+  coordinates: string;
 }
 
-const GeneratedPrompt: React.FC<GeneratedPromptProps> = ({ generatedPrompt }) => {
+const GeneratedPrompt: React.FC<GeneratedPromptProps> = ({ coordinates }) => {
+  // State to hold the generated prompt from the API
+  const [chatgptResponse, setChatgptResponse] = useState<string>('');
+
+  const handleGenerate = async () => {
+    try {
+      const apiRequestBody = {
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are receiving coordinates of objects as well as a caption describing the object. Reply in natural language describing the positional relationship for example a big round apple, is left of, above, behind, across, underneath, etc. Also it can be in relation to the canvas itself. The canvas is 600 wide, 400 height.',
+          },
+          { role: 'user', content: coordinates },
+        ],
+      };
+
+      const response = await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        apiRequestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_CHATGPT_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // Set the response data to the state
+      setChatgptResponse(response.data.choices[0].message.content);
+    } catch (error) {
+      console.error('Error fetching reply from OpenAI:', error);
+      setChatgptResponse('Error generating prompt');
+    }
+  };
+
   return (
     <div className="w-[600px] h-[200px] mt-4 p-4 border border-gray-300 bg-green-500">
       <h2 className="text-lg font-bold mb-2">Generated Prompt</h2>
-      <pre className="whitespace-pre-wrap">{generatedPrompt}</pre>
+      <pre className="whitespace-pre-wrap">{chatgptResponse}</pre>
 
       {/* Generate Button using the Button UI component */}
-      <Button >
-        Generate
-      </Button>
-
+      <Button onClick={handleGenerate}>Generate</Button>
     </div>
   );
 };
