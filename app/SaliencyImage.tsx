@@ -3,9 +3,13 @@ import { Button } from '@/components/ui/button';
 
 interface SaliencyImageProps {
   canvasDataURL: string;
+  setSalImage: (img: string) => void; //emit to front
 }
 
-const SaliencyImage: React.FC<SaliencyImageProps> = ({ canvasDataURL }) => {
+const SaliencyImage: React.FC<SaliencyImageProps> = ({ 
+  canvasDataURL, 
+  setSalImage,
+}) => {
   const [updatedImage, setUpdatedImage] = useState(canvasDataURL);
 
   const handleGenerate = async () => {
@@ -41,6 +45,7 @@ const SaliencyImage: React.FC<SaliencyImageProps> = ({ canvasDataURL }) => {
       
       // Update the state with the new image
       setUpdatedImage(processedImageURL);
+      setSalImage(processedImageURL);
       
     } catch (error) {
       console.error("Error processing image:", error);

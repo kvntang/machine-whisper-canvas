@@ -4,9 +4,13 @@ import axios from 'axios'; // Ensure axios is imported
 
 interface GeneratedPromptProps {
   coordinates: string;
+  setImagePrompt: (prompt: string) => void; //emit to front
 }
 
-const GeneratedPrompt: React.FC<GeneratedPromptProps> = ({ coordinates }) => {
+const GeneratedPrompt: React.FC<GeneratedPromptProps> = ({ 
+  coordinates,
+  setImagePrompt,
+}) => {
   // State to hold the generated prompt from the API
   const [chatgptResponse, setChatgptResponse] = useState<string>('');
 
@@ -17,7 +21,7 @@ const GeneratedPrompt: React.FC<GeneratedPromptProps> = ({ coordinates }) => {
         messages: [
           {
             role: 'system',
-            content: 'You are receiving coordinates of objects as well as a caption describing the object. Reply in natural language describing the positional relationship for example a big round apple, is left of, above, behind, across, underneath, etc. Also it can be in relation to the canvas itself. The canvas is 600 wide, 400 height.',
+            content: 'You are to write a vivid and descriptive image generation prompt. You are receiving coordinates of objects as well as a caption describing the object. Infer the postional relationship between objects and reply in natural language describing the positional relationship, so do not use numbers. Uee words is left of, above, behind, across, underneath. Reply 50 words. ',
           },
           { role: 'user', content: coordinates },
         ],
@@ -36,6 +40,8 @@ const GeneratedPrompt: React.FC<GeneratedPromptProps> = ({ coordinates }) => {
 
       // Set the response data to the state
       setChatgptResponse(response.data.choices[0].message.content);
+      setImagePrompt(response.data.choices[0].message.content);
+
     } catch (error) {
       console.error('Error fetching reply from OpenAI:', error);
       setChatgptResponse('Error generating prompt');

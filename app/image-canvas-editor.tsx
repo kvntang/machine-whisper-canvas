@@ -30,8 +30,12 @@ interface Image {
 export default function ImageCanvasEditor() {
   const [images, setImages] = useState<Image[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
-  const [coordinates, setCoordinates] = useState<string>('');
+  const [coordinates, setCoordinates] = useState<string>(''); //image prompts
   const [canvasDataURL, setCanvasDataURL] = useState<string>(''); // State to hold the emitted canvas image data URL
+  const [salImage, setSalImage] = useState<string>('');
+  const [imagePrompt, setImagePrompt] = useState<string>('');
+
+
 
   const handleDeleteImage = (imageId: number) => {
     setImages((prevImages) => prevImages.filter((img) => img.id !== imageId))
@@ -135,7 +139,7 @@ export default function ImageCanvasEditor() {
         }}>
           <GeneratedPromptWindow 
             coordinates={coordinates}
-          />
+            setImagePrompt={setImagePrompt}/>
         </div>
   
         {/* Second div in the third column */}
@@ -147,7 +151,9 @@ export default function ImageCanvasEditor() {
           border: '1px solid #ddd',
           borderRadius: '8px'
         }}>
-          <SaliencyImage canvasDataURL={canvasDataURL} />          
+          <SaliencyImage 
+          canvasDataURL={canvasDataURL} 
+          setSalImage={setSalImage}/>          
 
         </div>
 
@@ -159,7 +165,7 @@ export default function ImageCanvasEditor() {
           border: '1px solid #ddd',
           borderRadius: '8px'
         }}>
-          <StableDiffusion canvasDataURL={canvasDataURL} />   
+          <StableDiffusion salImage={salImage} imagePrompt={imagePrompt} />   
         </div>
       </div>
     </div>
