@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import useOpenCV from './OpenCV';
 
 interface SaliencyImageProps {
   canvasDataURL: string;
@@ -8,7 +7,6 @@ interface SaliencyImageProps {
 
 const SaliencyImage: React.FC<SaliencyImageProps> = ({ canvasDataURL }) => {
   const [updatedImage, setUpdatedImage] = useState(canvasDataURL);
-  const isOpenCVReady = useOpenCV(); // Load OpenCV globally
 
   const handleGenerate = async () => {
     if (!canvasDataURL) {
