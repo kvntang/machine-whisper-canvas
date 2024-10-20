@@ -51,7 +51,7 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     images.sort((a, b) => a.zIndex - b.zIndex).forEach((image) => {
@@ -271,16 +271,6 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
       width: '625px',
       padding: '10px',
     }}>
-      <canvas
-        ref={canvasRef}
-        width={600}
-        height={400}
-        className="border border-gray-300"
-        onMouseDown={handleCanvasMouseDown}
-        onMouseMove={handleCanvasMouseMove}
-        onMouseUp={handleCanvasMouseUp}
-        onMouseLeave={handleCanvasMouseLeave}
-      />
 
       <div className="mt-4 flex space-x-2">
         <Button onClick={() => fileInputRef.current?.click()}>
@@ -301,6 +291,18 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
           <ArrowDownCircle className="mr-2 h-4 w-4" /> Send Backward
         </Button>
       </div>
+
+      <canvas
+        ref={canvasRef}
+        width={600}
+        height={400}
+        onMouseDown={handleCanvasMouseDown}
+        onMouseMove={handleCanvasMouseMove}
+        onMouseUp={handleCanvasMouseUp}
+        onMouseLeave={handleCanvasMouseLeave}
+      />
+
+      
 
     </div>
   );

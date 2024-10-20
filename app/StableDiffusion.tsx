@@ -64,22 +64,22 @@ const StableDiffusion: React.FC<StableDiffusionProps> = ({ salImage, imagePrompt
   
 
   return (
-    <div className="w-[400px] h-auto mt-0 p-2">
-      <div className="flex justify-between items-center mb-2">
-        {/* Updated title from Saliency Map to Stable Diffusion */}
-        <h2 className="text-lg font-bold">Stable Diffusion</h2>
-        {/* Generate Button that triggers Stable Diffusion processing */}
-        <Button onClick={handleGenerate}>Generate</Button>
-      </div>
+    <div className="w-full h-auto mt-0 p-2 flex flex-col items-center">
+  <img
+    src={diffusionImage}
+    alt="Diffusion Output"
+    style={{ maxWidth: '100%', height: 'auto' }}
+  />
+  {/* Hidden canvas used to display Stable Diffusion output */}
+  <canvas id="output" style={{ display: 'none' }}></canvas>
 
-      <img
-        src={diffusionImage}
-        alt="Diffusion Output"
-        style={{ maxWidth: '100%', height: 'auto' }}
-      />
-      {/* Hidden canvas used to display Stable Diffusion output */}
-      <canvas id="output" style={{ display: 'none' }}></canvas>
-    </div>
+  <div className="mt-4">
+    <Button onClick={handleGenerate}>Generate</Button>
+  </div>
+</div>
+
+
+    
   );
 };
 

@@ -64,16 +64,53 @@ export default function ImageCanvasEditor() {
       padding: '5px' // Optional padding around the layout
     }}>
       
+      {/* Column 1 */}      <div className="p-2" style={{ 
+        flexBasis: '50%', // Larger column (50% of total width)
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start'
+      }}>
+        <div className="canvas-container" style={{
+          height: '500px', // Specific size for the canvas div
+          marginBottom: '20px',
+          padding: '5px',
+          backgroundColor: '#000000',
+          border: '1px solid #1d1d1d',
+          borderRadius: '30px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <ImageCanvas 
+            images={images}
+            setImages={setImages}
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+            setCoordinates={setCoordinates}
+            setCanvasDataURL={handleCanvasUpdate} // Pass the emit function
+          />
+        </div>
   
-      {/* Column 1: SidePanel - smaller column */}
+        <div style={{
+          height: '600px', // Specific size for the second div
+          padding: '10px',
+          backgroundColor: '#000000',
+          border: '1px solid #1d1d1d',
+          borderRadius: '30px'
+        }}>
+          <StableDiffusion salImage={salImage} imagePrompt={imagePrompt} />   
+        </div>
+      </div>
+  
+      {/* Column 2 */}
       <div className="p-2" style={{
-        flexBasis: '25%', // Smaller column (25% of total width)
-        display: 'flex', 
+        flexBasis: '50%', // Wider column
+        display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start'
       }}>
         <div style={{
-          height: '500px', // Specific size for side panel div
+          height: '500px',
           backgroundColor: '#e0f7fa',
           overflowY: 'auto',
           padding: '1px',
@@ -89,48 +126,9 @@ export default function ImageCanvasEditor() {
             setCoordinates={setCoordinates}
           />
         </div>
-      </div>
-
-      {/* Column 2: ImageCanvas - larger column */}
-      <div className="p-2" style={{ // Changed padding from 'p-8' to 'p-4'
-        flexBasis: '25%', // Larger column (50% of total width)
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start'
-      }}>
-        <div className="canvas-container" style={{
-          height: '500px', // Specific size for the canvas div
-          marginBottom: '20px',
-          padding: '5px',
-          backgroundColor: '#e0f7fa',
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}>
-          <ImageCanvas 
-            images={images}
-            setImages={setImages}
-            selectedImage={selectedImage}
-            setSelectedImage={setSelectedImage}
-            setCoordinates={setCoordinates}
-            setCanvasDataURL={handleCanvasUpdate} // Pass the emit function
-          />
-        </div>
-      </div>
   
-        
-      {/* Column 3: GeneratedPromptWindow + another div */}
-      <div className="p-2" style={{
-        flexBasis: '25%', // Maintain a wider column
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start'
-      }}>
-        {/* First div in the third column */}
         <div style={{
-          height: 'auto', // Changed height from '200px' to 'auto'
+          height: 'auto', // Auto height
           marginBottom: '20px',
           padding: '10px',
           backgroundColor: '#e0f7fa',
@@ -142,9 +140,8 @@ export default function ImageCanvasEditor() {
             setImagePrompt={setImagePrompt}/>
         </div>
   
-        {/* Second div in the third column */}
         <div style={{
-          height: 'auto', // Specific size for the second div
+          height: 'auto', // Auto height
           padding: '10px',
           marginBottom: '20px',
           backgroundColor: '#f0f4c3',
@@ -152,23 +149,10 @@ export default function ImageCanvasEditor() {
           borderRadius: '8px'
         }}>
           <SaliencyImage 
-          canvasDataURL={canvasDataURL} 
-          setSalImage={setSalImage}/>          
-
-        </div>
-
-        {/* third div in the third column */}
-        <div style={{
-          height: 'auto', // Specific size for the second div
-          padding: '10px',
-          backgroundColor: '#f0f4c3',
-          border: '1px solid #ddd',
-          borderRadius: '8px'
-        }}>
-          <StableDiffusion salImage={salImage} imagePrompt={imagePrompt} />   
+            canvasDataURL={canvasDataURL} 
+            setSalImage={setSalImage}/>          
         </div>
       </div>
     </div>
-  )  
-  
+  )
 }
