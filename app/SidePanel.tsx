@@ -45,15 +45,15 @@ const SidePanel: React.FC<SidePanelProps> = ({
   }, [images, setCoordinates]);
 
   return (
-    <div className="w-[400px] h-full p-4 overflow-y-auto"> {/* Removed fixed height to allow scrolling based on parent div height */}
-      <h2 className="text-xl font-bold mb-4">Image List</h2>
-
+    <div className="w-[400px] h-full p-4 overflow-y-auto text-white"> {/* Added text-white class */}
+      {/* <h2 className="text-xl  mb-4">Image List</h2> */}
+  
       {/* Image Meta Data Div */}
       {images.map((image) => (
         <div
           key={image.id}
           className={`mb-4 p-2 border ${
-            selectedImage === image.id ? 'border-blue-500' : 'border-gray-300'
+            selectedImage === image.id ? 'border-blue-500' : 'border-black'
           }`}
         >
           {/* Texts */}
@@ -64,7 +64,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
                 Center: ({Math.round(image.x)}, {Math.round(image.y)}) | Z-Index: {image.zIndex}
               </p>
             </div>
-
+  
             {/* Delete Button */}
             {selectedImage === image.id && (
               <Button
@@ -77,7 +77,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
               </Button>
             )}
           </div>
-
+  
           {/* Caption Text Box */}
           <div className="mt-2">
             <label htmlFor={`caption-${image.id}`} className="text-sm font-medium">
@@ -88,7 +88,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
               type="text"
               value={image.caption}
               onChange={(e) => handleCaptionChange(image.id, e.target.value)}
-              className="mt-1 block w-full px-2 py-1 border border-gray-300 rounded"
+              className="mt-1 block w-full px-2 py-1 border border-gray-300 rounded bg-gray-800 text-white" // Added bg-gray-800 and text-white
               placeholder="Enter caption..."
             />
           </div>
@@ -96,6 +96,7 @@ const SidePanel: React.FC<SidePanelProps> = ({
       ))}
     </div>
   );
+  
 };
 
 export default SidePanel;

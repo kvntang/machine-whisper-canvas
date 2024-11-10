@@ -21,7 +21,7 @@ const GeneratedPrompt: React.FC<GeneratedPromptProps> = ({
         messages: [
           {
             role: 'system',
-            content: 'You are to write a vivid and descriptive image generation prompt. You are receiving coordinates of objects as well as a caption describing the object. Infer the postional relationship between objects and reply in natural language describing the positional relationship, so do not use numbers. Uee words is left of, above, behind, across, underneath. Reply 50 words. ',
+            content: "You will receive a list of objects, each with a description and coordinates. Your task is to generate a descriptive prompt for Stable Diffusion, inferring the spatial relationships between objects based on their coordinates. Use terms like 'to the left of,' 'above,' 'behind,' 'across from,' and 'underneath' to describe their positions relative to one another. Ensure the prompt is vivid, capturing not just the positions, but also textures, lighting, and the overall atmosphere, creating a cohesive and detailed visual scene."
           },
           { role: 'user', content: coordinates },
         ],
@@ -51,13 +51,13 @@ const GeneratedPrompt: React.FC<GeneratedPromptProps> = ({
   return (
     <div className="w-[400px] h-auto mt-0 p-2">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-bold">Positional Prompt</h2>
+        <h2 className="text-lg font-bold text-white">Positional Prompt</h2>
         {/* Generate Button using the Button UI component */}
         <Button onClick={handleGenerate}>Generate</Button>
       </div>
-
+  
       {/* Directly render the generated response without an extra div */}
-      <pre className="whitespace-pre-wrap">{chatgptResponse}</pre>
+      <pre className="whitespace-pre-wrap text-white">{chatgptResponse}</pre>
     </div>
   );
 };

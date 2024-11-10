@@ -53,13 +53,13 @@ const SaliencyImage: React.FC<SaliencyImageProps> = ({
   };
 
   return (
-    <div className="w-[400px] h-auto mt-0 p-2">
+    <div className="w-[400px] h-auto mt-0 p-2 text-white"> {/* Added text-white class */}
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-lg font-bold">Saliency Map</h2>
         {/* Generate Button that triggers OpenCV processing */}
         <Button onClick={handleGenerate}>Generate</Button>
       </div>
-
+  
       <img
         src={updatedImage}
         alt="Canvas Output"
@@ -69,6 +69,7 @@ const SaliencyImage: React.FC<SaliencyImageProps> = ({
       <canvas id="output" style={{ display: 'none' }}></canvas>
     </div>
   );
+  
 };
 
 export default SaliencyImage;

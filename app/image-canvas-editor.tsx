@@ -111,11 +111,10 @@ export default function ImageCanvasEditor() {
       }}>
         <div style={{
           height: '500px',
-          backgroundColor: '#e0f7fa',
+          backgroundColor: '#000000',
           overflowY: 'auto',
           padding: '1px',
-          border: '1px solid #ddd',
-          borderRadius: '8px'
+
         }}>
           <SidePanel
             images={images}
@@ -128,11 +127,12 @@ export default function ImageCanvasEditor() {
         </div>
   
         <div style={{
-          height: 'auto', // Auto height
+          height: '200px', // Auto height
           marginBottom: '20px',
           padding: '10px',
-          backgroundColor: '#e0f7fa',
-          border: '1px solid #ddd',
+          overflowY: 'auto',
+          backgroundColor: '#000000',
+          border: '1px solid #1d1d1d',
           borderRadius: '8px'
         }}>
           <GeneratedPromptWindow 
@@ -144,8 +144,8 @@ export default function ImageCanvasEditor() {
           height: 'auto', // Auto height
           padding: '10px',
           marginBottom: '20px',
-          backgroundColor: '#f0f4c3',
-          border: '1px solid #ddd',
+          backgroundColor: '#000000',
+          border: '1px solid #1d1d1d',
           borderRadius: '8px'
         }}>
           <SaliencyImage 

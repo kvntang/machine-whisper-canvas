@@ -41,8 +41,8 @@ const StableDiffusion: React.FC<StableDiffusionProps> = ({ salImage, imagePrompt
         prompt: imagePrompt,
         init_images: [cleanedBase64Image], // Base64 string without the data URL prefix
         steps: 50,
-        cfg_scale: 7,
-        denoising_strength: 0.75,
+        cfg_scale: 9,
+        denoising_strength: 0.6,
         width: 512,
         height: 512,
       };

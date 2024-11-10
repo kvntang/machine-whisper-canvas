@@ -272,7 +272,7 @@ const ImageCanvas: React.FC<ImageCanvasProps> = ({
       padding: '10px',
     }}>
 
-      <div className="mt-4 flex space-x-2">
+      <div className="mt-4 flex space-x-2 p-4">
         <Button onClick={() => fileInputRef.current?.click()}>
           <Upload className="mr-2 h-4 w-4" /> Upload Image
         </Button>
